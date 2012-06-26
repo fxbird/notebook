@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="book.type">
+       <resultMap id="booktypeMap" type="booktype">
+           <id column="type_no" property="id"/>
+           <result column="type_dsc" property="name"/>
+           <result column="parent_type_no" property="parentTypeNo" typeHandler="dao.ParentTypeConveter"/>
+       </resultMap>
+  <select id="selectAll" resultMap="booktypeMap">
+     select 
+        type_no ,
+        type_dsc ,
+        parent_type_no
+     from book_type
+     order by lower(type_dsc)
+  </select>
+    
+   <insert id="insertBookType"  parameterType="booktype">
+       <selectKey keyProperty="id" resultType="int" order="BEFORE">
+           select max(type_no)+1 from book_type;
+       </selectKey>
+       insert into book_type(type_no,type_dsc,parent_type_no,show,del) values(
+       #{id},#{name},#{parentTypeNo},1,0)
+   </insert>
+
+   <update id="updateBookType" parameterType="booktype">
+       update book_type
+       <set>
+           <if test="name!=null">type_dsc=#{name},</if>
+           <if test="parentTypeNo!=null">parent_type_no=#{parentTypeNo}</if>
+       </set>
+       where type_no=#{id}
+   </update>
+
+   <delete id="deepDelete" parameterType="booktype">
+       delete from book_type where type_no=#{id}
+   </delete>
+    
+    <select id="selectTypesWithCond" parameterType="booktype" resultType="booktype">
+        select *
+        from book_type
+        <where>
+            <if test="id!=null">type_no=#{id} and</if>
+            <if test="name!=null">type_dsc=#{name} and</if>
+            <if test="parentTypeNo!=null">parent_type_no=#{parentTypeNo}</if>
+        </where>
+    </select>
+
+    <select id="selectSameTypeNameWhenInsert" parameterType="booktype" resultType="booktype">
+         select *
+        from book_type
+        where parent_type_no=#{parentTypeNo} and
+        type_dsc=#{name}
+    </select>
+
+    <select id="selectSameTypeNameWhenEdit" parameterType="booktype" resultType="booktype">
+         select *
+        from book_type
+        where parent_type_no=#{parentTypeNo} and
+        type_dsc=#{name}   and
+        type_no!=#{id}
+    </select>
+
+    <select id="selectMaxTypeNo" resultType="int">
+        select max(type_no) from   book_type
+    </select>
+
+    <update id="updateParentType" parameterType="map">
+        update book_type
+        set parent_type_no=#{parent.userObject.id}
+        where type_no in
+        <foreach item="it" collection="nodes" separator="," open="(" close=")">
+            #{it.userObject.id}
+        </foreach>
+    </update>
+
+    <select id="findDescrById" parameterType="int" resultType="string">
+        SELECT book_type.type_dsc FROM book_type   where type_no= #{id}
+    </select>
+
+    <update id="hide" parameterType="int">
+        update book_type set show=0 where type_no=#{id}
+    </update>
+
+    <update id="show" parameterType="int">
+        update book_type set show=1 where type_no=#{id}
+    </update>
+
+    <update id="logicalDelete" parameterType="int">
+        update book_type set del=1 where type_no=#{id}
+    </update>
+
+    <select id="findHidden" resultType="booktype">
+        select * from book_type where show=0 and del=0 order by type_dsc
+    </select>
+
+    <select id="findAll" resultType="booktype">
+        select * from book_type order by type_no
+    </select>
+</mapper>

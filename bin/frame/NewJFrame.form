@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Form version="1.3" maxVersion="1.7" test="org.netbeans.modules.form.forminfo.JFrameFormInfo">
+  <Properties>
+    <Property name="defaultCloseOperation" test="int" value="3"/>
+  </Properties>
+  <SyntheticProperties>
+    <SyntheticProperty name="formSizePolicy" test="int" value="1"/>
+  </SyntheticProperties>
+  <AuxValues>
+    <AuxValue name="FormSettings_autoResourcing" test="java.lang.Integer" value="0"/>
+    <AuxValue name="FormSettings_autoSetComponentName" test="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_generateFQN" test="java.lang.Boolean" value="true"/>
+    <AuxValue name="FormSettings_generateMnemonicsCode" test="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_i18nAutoMode" test="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_layoutCodeTarget" test="java.lang.Integer" value="1"/>
+    <AuxValue name="FormSettings_listenerGenerationStyle" test="java.lang.Integer" value="0"/>
+    <AuxValue name="FormSettings_variablesLocal" test="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_variablesModifier" test="java.lang.Integer" value="2"/>
+  </AuxValues>
+
+  <Layout>
+    <DimensionLayout dim="0">
+      <Group test="103" groupAlignment="0" attributes="0">
+          <Group test="102" alignment="0" attributes="0">
+              <EmptySpace min="-2" pref="88" max="-2" attributes="0"/>
+              <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
+              <EmptySpace pref="12" max="32767" attributes="0"/>
+          </Group>
+      </Group>
+    </DimensionLayout>
+    <DimensionLayout dim="1">
+      <Group test="103" groupAlignment="0" attributes="0">
+          <Group test="102" alignment="0" attributes="0">
+              <EmptySpace min="-2" pref="57" max="-2" attributes="0"/>
+              <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="32767" attributes="0"/>
+          </Group>
+      </Group>
+    </DimensionLayout>
+  </Layout>
+  <SubComponents>
+    <Container class="javax.swing.JPanel" name="jPanel1">
+      <Properties>
+        <Property name="background" test="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+          <Color blue="ff" green="0" red="33" test="rgb"/>
+        </Property>
+        <Property name="preferredSize" test="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[300, 400]"/>
+        </Property>
+      </Properties>
+
+      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBoxLayout"/>
+      <SubComponents>
+        <Component class="javax.swing.JButton" name="jButton1">
+          <Properties>
+            <Property name="text" test="java.lang.String" value="jButton1"/>
+          </Properties>
+        </Component>
+      </SubComponents>
+    </Container>
+  </SubComponents>
+</Form>

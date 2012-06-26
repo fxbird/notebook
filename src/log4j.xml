@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration PUBLIC "" "log4j.dtd">
+<log4j:configuration xmlns:log4j='http://jakarta.apache.org/log4j/'>
+
+    <appender name="file" class="org.apache.log4j.FileAppender">
+        <param name="File" value="d:/logs/notebook.log"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss} [%-5p](%C:%L) %m%n"/>
+        </layout>
+    </appender>
+
+    <appender name="general" class="org.apache.log4j.ConsoleAppender">
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss} [%-5p](%C:%L) %m%n"/>
+        </layout>
+    </appender>
+    
+    <logger name="log4j.logger.com.ibatis" additivity="false">
+        <level value="debug"/>
+    </logger>
+
+    <root>
+        <level value="debug"/>
+        <appender-ref ref="general"/>
+        <appender-ref ref="file"/>
+    </root>
+
+</log4j:configuration>
