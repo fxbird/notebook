@@ -1,12 +1,5 @@
 package other;
 
-/**
- * Created by IntelliJ IDEA.
- * User: xdg
- * Date: 2008-6-19
- * Time: 22:15:49
- * To change this template use File | Settings | File Templates.
- */
 public interface Constant {
     String TYPE_SORT_RECORD_SUM="SUM";
     String TYPE_SORT_RECORD_ALPHA="WORD";
@@ -17,4 +10,5 @@ public interface Constant {
     int MAX_RECENT_BROWSED_REC=20;
 
     boolean showInConsole=false;
+    String CONFIG_PROP_PATH="/config.properties";
 }

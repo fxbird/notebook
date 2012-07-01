@@ -4,13 +4,6 @@ import java.util.HashMap;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * Created by IntelliJ IDEA.
- * User: xdg
- * Date: 2008-7-5
- * Time: 21:50:24
- * To change this template use File | Settings | File Templates.
- */
 public class MultipleMap {
     private HashMap map=new HashMap();
     private int len;
@@ -19,11 +12,11 @@ public class MultipleMap {
        if (len==0){
            len=stuff.length;
        } else if (len!=stuff.length){
-           throw new Exception("元素个数和已有的不一致，请确认");
+           throw new Exception("The number of element is not equal to existing，please confirm");
        }
 
        if (map.containsKey(alias)){
-           throw new Exception("有别名"+alias+"的元素已经存在了，不能重复指定");
+           throw new Exception("The element with alias "+alias+" has existed, change it please");
        }
 
        map.put(alias, Arrays.asList(stuff));

@@ -33,6 +33,7 @@ import other.*;
 import javax.swing.*;
 
 import tree.TypeTreeWrapper;
+import util.ConfigParser;
 import vetoselection.VetoTreeSelectionListener;
 import vetoselection.VetoTreeSelectionModel;
 import xdg.XdgUtil;
@@ -106,10 +107,12 @@ public class FrmMainI extends JFrame {
     private static PropertiesConfiguration pc=PropHelper.getPropConfigInstance();
     private static final String RECENT_VIEWED_PATH=SysPropUtil.getTempDir()+ "\\recentNote.tmp";
     private final static Log log = LogFactory.getLog(FrmMainI.class);
+    private ConfigParser configParser=ConfigParser.getInstance();
     /**
      * Creates new form FrmMain
      */
     public FrmMainI() {
+        configParser.loadConfig();
         initComponents();
         initRecentViewed();
         addRecentVisitingButton();
@@ -869,8 +872,6 @@ public class FrmMainI extends JFrame {
         MyUtil.enableInsertTabOnNewLine(taContent);
 
         try {
-            readProperties();
-
             backupDB();
 
             initData();
@@ -1005,18 +1006,24 @@ public class FrmMainI extends JFrame {
 
         searchedNotes = null;
 
-        if (searchContent) {
-            searchedNotes = bookBO.findNoteByTypeTitleContent(typeWrapper.isNotSelecting() ? null : typeWrapper.getSelectedNode(),
-                    MyUtil.getComboBoxValue(cbKey));
-        } else {
-            searchedNotes = bookBO.findNoteByTypeTitle(typeWrapper.isNotSelecting() ? null : typeWrapper.getSelectedNode(),
-                    MyUtil.getComboBoxValue(cbKey));
+        try {
+            if (searchContent) {
+                searchedNotes = bookBO.findNoteByTypeTitleContent(typeWrapper.isNotSelecting() ? null : typeWrapper.getSelectedNode(),
+                        MyUtil.getComboBoxValue(cbKey));
+            } else {
+                searchedNotes = bookBO.findNoteByTypeTitle(typeWrapper.isNotSelecting() ? null : typeWrapper.getSelectedNode(),
+                        MyUtil.getComboBoxValue(cbKey));
+            }
+        } catch (Exception e) {
+            log.error(e);
+            throw e;
         }
 
 
         taContent.setText("");
         lblCount.setText(searchedNotes.size() + "");
-        currentModel = new NoteTableModel2(DBConnection.getConnection(),
+        currentModel = new NoteTableModel2(DBConnection.getConnection(configParser.getDriver(),
+                configParser.getRealUrl(),configParser.getUserName(),configParser.getPassword()),
                 tblData, searchedNotes, "ID", "id", "book",
                 dbwin.Constant.KEY_GENE_NEXT_OF_MAX, this);
         currentModel.setFieldPropCol(new String[]{"TITLE", "TIM", "TYPE_NO",
@@ -1429,47 +1436,24 @@ public class FrmMainI extends JFrame {
     }
 
     private void backupDB() throws IOException {
-        Properties prop = new Properties();
-        Date d = new Date();
-
-        prop.load(FrmMainI.class.getResourceAsStream("/config.properties"));
-        String lastBackupTime = System.getProperties().getProperty("backup.lastTime");
-        String backupPath = System.getProperties().getProperty("backup.path");
-        int backupInterval = Integer.parseInt(System.getProperties().getProperty("backup.interval"));
-
-        if (lastBackupTime == null || (d.getTime() - Long.parseLong(lastBackupTime)) > backupInterval * 24 * 60 * 60 * 1000) {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-            String fileName = backupPath + "/note-" + sdf.format(d) + ".fdb";
-            XdgUtil.fileCopy(System.getProperties().getProperty("dbpath"),
-                    fileName);
+        //new start
+        //todo back up db through local net, which is from lapto to home pc
+        if (configParser.getCurrentPlace().contains("home") && configParser.getCurrentPlace().contains("pc")){
+            return;
         }
 
-        prop.put("backup.lastTime", d.getTime() + "");
-        prop.store(new FileOutputStream(new File(System.getProperties().getProperty("config.path"))), "");
-    }
+        PropUtil pu=PropUtil.getInstance(Constant.CONFIG_PROP_PATH);
+        long lastBackupMs=pu.getLong("last.backup.ms",0);
+        if (lastBackupMs==0){
+            pu.addAndSave("last.backup.ms",new Date().getTime()+"");
+            pu.addAndSave("last.backup.string",DateTimeUtil.formatYmdHms(new Date()));
+        }else {
+           Date lastBackupDate= new Date(lastBackupMs);
+           double dayIntvl= DateTimeUtil.diffByDay(new Date(lastBackupMs),new Date());
+           if (dayIntvl>configParser.getBackupIntvl()){
 
-    private void readProperties() throws IOException, URISyntaxException {
-        Properties prop = new Properties();
-        InputStream configIS = DBConnection.class.getResourceAsStream("/config.properties");
-        URL url = DBConnection.class.getResource("/config.properties");
-        prop.load(configIS);
-        String dbpath;
-        String os = System.getProperties().getProperty("os.name");
-        if (os.toLowerCase().contains("window")) {
-            dbpath = prop.getProperty("win");
-        } else {
-            dbpath = prop.getProperty("non_win");
+           }
         }
-
-        System.getProperties().setProperty("dbpath", dbpath);
-        System.getProperties().setProperty("config.path", url.getPath().replaceAll("%20", " "));
-        if (prop.getProperty("backup.lastTime") != null) {
-            System.getProperties().setProperty("backup.lastTime", prop.getProperty("backup.lastTime"));
-        }
-        System.getProperties().setProperty("backup.path", prop.getProperty("backup.path"));
-        System.getProperties().setProperty("backup.interval", prop.getProperty("backup.interval"));
-
-
     }
 
     private class CommonAction implements ActionListener {

@@ -1,5 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<db>
-    <win>h:\db\note.fdb</win>
-    <non_win>/mnt/sda8/db/note.fdb</non_win>
-</db>
+<notebook-config>
+    <backup-interval>10</backup-interval>
+    <config>
+        <place>home_pc</place>
+        <db>
+            <driver>org.firebirdsql.jdbc.FBDriver</driver>
+            <username>sysdba</username>
+            <password>masterkey</password>
+            <win>jdbc:firebirdsql:192.168.1.100/3050:f:/db/note.fdb?lc_ctype=UTF8</win>
+            <linux>/mnt/sda8/db/note.fdb</linux>
+        </db>
+        <log></log>
+    </config>
+
+    <config>
+        <db>
+            <place>laptop</place>
+            <driver>org.firebirdsql.jdbc.FBDriver</driver>
+            <username>sysdba</username>
+            <password>masterkey</password>
+            <win>jdbc:firebirdsql:localhost/3050:f:/db/note.fdb?lc_ctype=UTF8</win>
+            <linux>/mnt/sda8/db/note.fdb</linux>
+            <backup-path></backup-path>
+        </db>
+        <log></log>
+    </config>
+
+    <config>
+        <db>
+            <place>company</place>
+            <driver>org.firebirdsql.jdbc.FBDriver</driver>
+            <username>sysdba</username>
+            <password>masterkey</password>
+            <win>h:\db\note.fdb</win>
+            <linux>/mnt/sda8/db/note.fdb</linux>
+            <backup-path></backup-path>
+        </db>
+        <log></log>
+    </config>
+</notebook-config>

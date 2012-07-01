@@ -292,7 +292,7 @@ public abstract class DbWinModel extends AbstractTableModel {
             if (quesMark.length()==0){
                quesMark.append("?");
             } else {
-               quesMark.append(",?");
+                quesMark.append(",?");
             }
         }
 
@@ -308,8 +308,6 @@ public abstract class DbWinModel extends AbstractTableModel {
             } else {
                 sqlUpd.append(" ," + tblFieldNames[i] + "=?");
             }
-
-
         }
 
 
