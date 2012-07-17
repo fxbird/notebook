@@ -1,22 +1,22 @@
 package bean;
 
-import dbwin.WinBean;
-
+import dbwin.BeanState;
+import dbwin.HbnWinBean;
 import java.io.Serializable;
-import java.sql.Timestamp;
+import java.util.Date;
 
-public class Note implements WinBean,Serializable {
+public class Note implements HbnWinBean, Serializable {
     private static final long serialVersionUID = -8363339156398741610L;
     private int id;
     private String title;
     private String content;
-    private Integer typeId;
     private String typeName;
-    private Timestamp ts;
-    private int status;
     private int del;
     private int show;
-    private Type type;
+    private NoteType noteType;
+    private BeanState beanState;
+    private Date createDate;
+    private Date updateDate;
 
     public int getId() {
         return id;
@@ -42,21 +42,6 @@ public class Note implements WinBean,Serializable {
         this.content = content;
     }
 
-    public Timestamp getTs() {
-        return ts;
-    }
-
-    public void setTs(Timestamp ts) {
-        this.ts = ts;
-    }
-
-    public void setStatus(int status) {
-        this.status = status;
-    }
-
-    public int getStatus() {
-        return status;
-    }
 
     public int getDel() {
         return del;
@@ -74,21 +59,14 @@ public class Note implements WinBean,Serializable {
         this.show = show;
     }
 
-    public Type getType() {
-        return type;
+    public NoteType getNoteType() {
+        return noteType;
     }
 
-    public void setType(Type type) {
-        this.type = type;
+    public void setNoteType(NoteType noteType) {
+        this.noteType = noteType;
     }
 
-    public Integer getTypeId() {
-        return typeId;
-    }
-
-    public void setTypeId(Integer typeId) {
-        this.typeId = typeId;
-    }
 
     public String getTypeName() {
         return typeName;
@@ -96,5 +74,35 @@ public class Note implements WinBean,Serializable {
 
     public void setTypeName(String typeName) {
         this.typeName = typeName;
+    }
+
+
+    public BeanState getState() {
+        return beanState;
+    }
+
+    public void setState(BeanState beanState) {
+        this.beanState = beanState;
+    }
+
+    @Override
+    public String getClassName() {
+        return "Note";
+    }
+
+    public Date getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
+    }
+
+    public Date getUpdateDate() {
+        return updateDate;
+    }
+
+    public void setUpdateDate(Date updateDate) {
+        this.updateDate = updateDate;
     }
 }

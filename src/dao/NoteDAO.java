@@ -1,33 +1,21 @@
 package dao;
 
+
+import bean.Note;
+import bean.NoteType;
 import org.apache.ibatis.session.SqlSessionFactory;
+
 import java.util.List;
 import java.util.Map;
 
-import bean.Note;
+public interface NoteDAO {
+       public List<Note> findByTypeTitle(final List<NoteType> types,final List<String> keys);
 
-public class NoteDAO extends AbsBaseIbatisDAO {
-    public NoteDAO(String namespace, SqlSessionFactory factory) {
-        super(namespace, factory);
-    }
+       public List<Note> findByTypeTitleContent(final List<NoteType> types,final List<String> keys);
 
-    public List<Note> findByTypeTitle(Map params){
-      return  selectList("findByTypeTitle",params);
-    }
+       public void deepDeleteByType(final int id);
 
-    public List<Note> findByTypeTitleContent(Map params){
-        return  selectList("findByTypeTitleContent",params);
-    }
+       public void update(Note note);
 
-    public void deepDeleteByType(int id){
-        delete("deepDeleteByType",id);
-    }
-
-    public void update(Map params){
-        update("update",params);
-    }
-
-    public void insert(Note note){
-        insert("insert",note);
-    }
+       public void insert(Note note);
 }

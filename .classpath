@@ -10,9 +10,7 @@
 	<classpathentry kind="lib" path="lib/jaxen-1.1-beta-4.jar"/>
 	<classpathentry kind="lib" path="lib/jaybird-full-2.1.6.jar"/>
 	<classpathentry kind="lib" path="lib/log4j-1.2.16.jar"/>
-	<classpathentry kind="lib" path="lib/mybatis-3.0.2.jar"/>
 	<classpathentry kind="lib" path="lib/MyLib.jar"/>
-	<classpathentry kind="lib" path="lib/splash.png"/>
 	<classpathentry kind="lib" path="lib/spring.jar"/>
 	<classpathentry kind="lib" path="lib/swing-layout-1.0.3.jar"/>
 	<classpathentry kind="lib" path="lib/AbsoluteLayout.jar"/>
@@ -20,6 +18,9 @@
 	<classpathentry kind="lib" path="lib/commons-io-1.4.jar"/>
 	<classpathentry kind="lib" path="lib/commons-configuration-1.7.jar"/>
 	<classpathentry kind="lib" path="lib/commons-collections-3.2.1.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/Bird_Common_Lib"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Common-Lib"/>
+	<classpathentry kind="lib" path="lib/Bird-Common-Lib-0.5.jar"/>
+	<classpathentry kind="lib" path="lib/javassist-3.8.0.GA.jar"/>
+	<classpathentry kind="lib" path="lib/mybatis-3.0.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

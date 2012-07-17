@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="bean">
+    <class name="NoteType" table="book_type">
+        <id name="id" type="int" column="type_no">
+            <generator class="increment"/>
+        </id>
+
+        <property name="name" type="string" column="type_dsc"/>
+
+        <property name="show" column="show" type="int"/>
+        <property name="del" column="del" type="int"/>
+        <many-to-one name="parentType" class="NoteType" column="PARENT_TYPE_NO"/>
+
+        <set name="childTypes" cascade="all" inverse="true" lazy="true">
+            <key column="type_no"/>
+            <one-to-many class="NoteType"/>
+        </set>
+
+    </class>
+
+</hibernate-mapping>

@@ -12,16 +12,14 @@ import java.awt.event.MouseListener;
 import java.util.List;
 
 import javax.swing.AbstractAction;
-import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.table.AbstractTableModel;
 
+import bean.FavoriteNote;
 import org.apache.commons.lang.time.DateFormatUtils;
-import org.apache.log4j.lf5.util.DateFormatManager;
 
 import xdg.XdgUtil;
 
-import bean.FavoriteItem;
 import bo.BookBO;
 
 /**
@@ -152,10 +150,10 @@ public class FrmFavorite extends javax.swing.JFrame {
 }
 
 class FavoriteTableModel extends AbstractTableModel {
-	private List<FavoriteItem> data;
-	private String[] colNames = {"No.", "Note No.", "Title","Type","Drop Date" };
+	private List<FavoriteNote> data;
+	private String[] colNames = {"No.", "Note No.", "Title","NoteType","Drop Date" };
 
-	public FavoriteTableModel(List<FavoriteItem> data) {
+	public FavoriteTableModel(List<FavoriteNote> data) {
 		this.data = data;
 	}
 
@@ -177,7 +175,7 @@ class FavoriteTableModel extends AbstractTableModel {
 
 	@Override
 	public Object getValueAt(int row, int col) {
-		FavoriteItem item = data.get(row);
+		FavoriteNote item = data.get(row);
 		
 		switch (col) {
 		case 0:
@@ -187,9 +185,9 @@ class FavoriteTableModel extends AbstractTableModel {
 		case 2:
 			return item.getNote().getTitle();
 		case 3:
-			return item.getType().getName();
+			return item.getNoteType().getName();
 		case 4:
-			return DateFormatUtils.format(item.getDropDate(),"yyyy/MM/dd kk:mm:ss");
+			return DateFormatUtils.format(item.getDropInDate(),"yyyy/MM/dd kk:mm:ss");
 		default:
 			return null;
 		}

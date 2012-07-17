@@ -5,7 +5,6 @@ import java.net.URISyntaxException;
 
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.ibatis.io.Resources;
-import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import util.ConfigParser;
@@ -69,7 +68,7 @@ public class DBConnection {
     public static SqlSessionFactory createSessionFactory() throws IOException {
         if (factory != null) return factory;
 
-        Reader reader = Resources.getResourceAsReader("dao/dao.xml");
+        Reader reader = Resources.getResourceAsReader("dao/ibatis/dao.xml");
 
         ConfigParser configParser=ConfigParser.getInstance();
         if (configParser.isNotLoaded()){

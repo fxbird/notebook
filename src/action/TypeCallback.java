@@ -1,7 +1,7 @@
 package action;
 
-import bean.Type;
+import bean.NoteType;
 
 public interface TypeCallback {
-    void handle(Type type);
+    void handle(NoteType noteType);
 }

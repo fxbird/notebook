@@ -1,6 +1,7 @@
 package dbwin.editor;
 
-import bean.Type;
+import bean.NoteType;
+
 import javax.swing.*;
 import javax.swing.table.TableCellEditor;
 import java.util.List;
@@ -39,8 +40,8 @@ public class TypeEditor extends AbstractCellEditor implements  TableCellEditor ,
 
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
         for (int i = 0; i < types.size(); i++) {
-             Type type=(Type)types.get(i);
-             if (type.getId().equals(value)){
+             NoteType noteType =(NoteType)types.get(i);
+             if (noteType.getId().equals(value)){
                  cb.setSelectedIndex(i);
                  break;
              }

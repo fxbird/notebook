@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="book.favorite">
+   <insert id="insertItem" parameterType="map">
+       insert into favorite(note_no,drop_date) values
+       (#{noteNo},#{dropInDate})
+   </insert>
+
+   <delete id="deleteItem" parameterType="int">
+       delete from favorite where note_no=#{no}
+   </delete>
+
+    <select id="selectItem" parameterType="int" resultType="int">
+        select 1 from favorite where note_no=#{no}
+    </select>
+
+    <select id="selectAllItem" resultType="favoriteItem">
+        select
+            f.note_no "note.id",
+            f.drop_date dropInDate,
+            t.type_dsc "type.name",
+ 			b.title "note.title",
+            b.type_no "type.id"
+       from
+            favorite f,book b,book_type t
+       where
+            f.note_no=b.id
+            and b.type_no=t.type_no
+    </select>
+</mapper>

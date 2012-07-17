@@ -1,6 +1,6 @@
-import bean.Type;
+import bean.NoteType;
 import bo.BookBO;
-import dao.TypeDAO;
+import dao.ibatis.NoteTypeDAOIbts;
 import db.DBConnection;
 
 import java.io.*;
@@ -12,7 +12,7 @@ public class UpdateParentType {
     private static String path="E:/My Doc/programming/java/projects/idea/book2/types.note";
     public static void main(String[] args) throws IOException, ClassNotFoundException {
         BookBO bo=new BookBO();
-        TypeDAO typeDAO=new TypeDAO("book.type", DBConnection.createSessionFactory());
+        NoteTypeDAOIbts typeDAO=new NoteTypeDAOIbts("book.type", DBConnection.createSessionFactory());
         bo.setTypeDAO(typeDAO);
 
 //        generateSerialized(path,bo);
@@ -21,9 +21,9 @@ public class UpdateParentType {
     }
 
     public static void generateSerialized(String path,BookBO bo) throws IOException {
-        List<Type> types=bo.getAllTypes();
+        List<NoteType> noteTypes =bo.getAllTypes();
         ObjectOutputStream oos=new ObjectOutputStream(new FileOutputStream(path));
-        oos.writeObject(types);
+        oos.writeObject(noteTypes);
         oos.close();
     }
 
@@ -31,8 +31,8 @@ public class UpdateParentType {
             throws ClassNotFoundException, IOException {
         ObjectInputStream ois=new ObjectInputStream(new FileInputStream(path));
 
-          List<Type> types=( List<Type>)ois.readObject();
-         for (Type t:types){
+          List<NoteType> noteTypes =( List<NoteType>)ois.readObject();
+         for (NoteType t: noteTypes){
              t.setName(null);
              bo.updateTypeDyn(t);
          }
@@ -44,13 +44,13 @@ public class UpdateParentType {
             throws ClassNotFoundException, IOException {
           ObjectInputStream ois=new ObjectInputStream(new FileInputStream(path));
 
-          List<Type> types=( List<Type>)ois.readObject();
-        Collections.sort(types,new Comparator<Type>(){
-            public int compare(Type t1, Type t2) {
+          List<NoteType> noteTypes =( List<NoteType>)ois.readObject();
+        Collections.sort(noteTypes,new Comparator<NoteType>(){
+            public int compare(NoteType t1, NoteType t2) {
                 return t1.getId()-t2.getId();
             }
         });
-         for (Type t:types){
+         for (NoteType t: noteTypes){
              System.out.printf("id: %d, parent: %d, name : %s\n",t.getId(),t.getParentTypeNo(),t.getName());
          }
         ois.close();

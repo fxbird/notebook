@@ -1,6 +1,6 @@
 package tree;
 
-import bean.Type;
+import bean.NoteType;
 import bo.BookBO;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -38,12 +38,12 @@ public class TypeTreeWrapper {
         this.bo = bo;
         this.parentComp=parentComp;
 
-        Type t = new Type();
+        NoteType t = new NoteType();
         t.setId(0);
         t.setName("All");
-        List<Type> types = bo.getAllTypes();
+        List<NoteType> noteTypes = bo.getAllTypes();
         root = new DefaultMutableTreeNode(t);
-        generateTree(root, types);
+        generateTree(root, noteTypes);
 
         //create tree
         model=new DefaultTreeModel(root);
@@ -87,7 +87,7 @@ public class TypeTreeWrapper {
                 while (nodes.hasMoreElements()){
                     DefaultMutableTreeNode node=(DefaultMutableTreeNode)nodes.nextElement();
                     DefaultMutableTreeNode parent=(DefaultMutableTreeNode)node.getParent();
-                    Type t=(Type)node.getUserObject();
+                    NoteType t=(NoteType)node.getUserObject();
                     if (t.getName().toLowerCase().startsWith(key.toLowerCase()))
                         tree.expandPath(new TreePath(parent.getPath()));
                 }
@@ -114,11 +114,11 @@ public class TypeTreeWrapper {
         }
     }
 
-    public static void generateTree(DefaultMutableTreeNode node, List<Type> types) {
+    public static void generateTree(DefaultMutableTreeNode node, List<NoteType> noteTypes) {
 
-        Type parent = (Type) node.getUserObject();
+        NoteType parent = (NoteType) node.getUserObject();
         List<DefaultMutableTreeNode> sonNodeList = new ArrayList<DefaultMutableTreeNode>();
-        for (Type t : types) {
+        for (NoteType t : noteTypes) {
             if (parent.getId().equals(t.getParentTypeNo())) {
                 DefaultMutableTreeNode sonNode = new DefaultMutableTreeNode(t);
                 node.add(sonNode);
@@ -127,7 +127,7 @@ public class TypeTreeWrapper {
         }
 
         for (DefaultMutableTreeNode n : sonNodeList) {
-            generateTree(n, types);
+            generateTree(n, noteTypes);
         }
     }
 
@@ -196,10 +196,10 @@ public class TypeTreeWrapper {
     }
 
     private void add() {
-        Type parentType=getSelectedType();
+        NoteType parentNoteType =getSelectedType();
         DefaultMutableTreeNode parentNode=getSelectedNode();
-        Type t=new Type();
-        t.setParentTypeNo(parentType.getId()==0?null:parentType.getId());
+        NoteType t=new NoteType();
+        t.setParentTypeNo(parentNoteType.getId()==0?null: parentNoteType.getId());
         t.setName("");
         DefaultMutableTreeNode newNode=new DefaultMutableTreeNode(t);
         model.insertNodeInto(newNode,parentNode,parentNode.getChildCount());//note it
@@ -213,16 +213,16 @@ public class TypeTreeWrapper {
     }
 
     private void deepDelete() {
-        Type type = getSelectedType();
+        NoteType noteType = getSelectedType();
 
-        if (Msg.showConfirm(parentComp, "Really deepDelete \"" + type + "\" and its descendant ?") == 1) {
+        if (Msg.showConfirm(parentComp, "Really delete \"" + noteType + "\" and its descendant ?") == 1) {
             try {
                DefaultMutableTreeNode node=getSelectedNode();
                 model.removeNodeFromParent(node);
                 Enumeration e= node.breadthFirstEnumeration();
                 while (e.hasMoreElements()){
                     DefaultMutableTreeNode n=(DefaultMutableTreeNode)e.nextElement();
-                    Type t=(Type)n.getUserObject();
+                    NoteType t=(NoteType)n.getUserObject();
                     bo.deepDeleteType(t);
                 }
             } catch (Exception ex) {
@@ -233,16 +233,16 @@ public class TypeTreeWrapper {
     }
 
     private void logicalDelete(){
-       Type type = getSelectedType();
+       NoteType noteType = getSelectedType();
 
-        if (Msg.showConfirm(parentComp, "Really delete \"" + type + "\" and its descendant logically ?") == 1) {
+        if (Msg.showConfirm(parentComp, "Really delete \"" + noteType + "\" and its descendant logically ?") == 1) {
             try {
                DefaultMutableTreeNode node=getSelectedNode();
                 model.removeNodeFromParent(node);
                 Enumeration e= node.breadthFirstEnumeration();
                 while (e.hasMoreElements()){
                     DefaultMutableTreeNode n=(DefaultMutableTreeNode)e.nextElement();
-                    Type t=(Type)n.getUserObject();
+                    NoteType t=(NoteType)n.getUserObject();
                     bo.logicalDeleteType(t);
                 }
             } catch (Exception ex) {
@@ -252,9 +252,9 @@ public class TypeTreeWrapper {
         }
     }
 
-    public Type getSelectedType(){
+    public NoteType getSelectedType(){
          DefaultMutableTreeNode node=(DefaultMutableTreeNode)tree.getLastSelectedPathComponent();
-         Type t=(Type)node.getUserObject();
+         NoteType t=(NoteType)node.getUserObject();
         return t;
     }
 
@@ -269,9 +269,9 @@ public class TypeTreeWrapper {
         log.debug("type id wanted to highlight : "+typeNo);
         while (e.hasMoreElements()){
            DefaultMutableTreeNode node=(DefaultMutableTreeNode)e.nextElement();
-           Type type=(Type)node.getUserObject();
-           log.debug("type : id = "+type.getId()+", name = "+type.getName());
-           if (type.getId().equals(typeNo)){
+           NoteType noteType =(NoteType)node.getUserObject();
+           log.debug("noteType : id = "+ noteType.getId()+", name = "+ noteType.getName());
+           if (noteType.getId().equals(typeNo)){
                tree.clearSelection();
                tree.addSelectionPath(new TreePath(node.getPath()));
                break;
@@ -325,7 +325,7 @@ public class TypeTreeWrapper {
 
     class TypeNodeEditor extends DefaultCellEditor{
         private JTextField tf;
-        private Type actualObj;
+        private NoteType actualObj;
         TypeNodeEditor(JTextField tf){
            super(tf);
            this.tf=tf;
@@ -333,7 +333,7 @@ public class TypeTreeWrapper {
 
         public boolean stopCellEditing() {
            if (XdgUtil.isEmpty(tf.getText())) return false;
-           Type t=getSelectedType();
+           NoteType t=getSelectedType();
            String oldName=t.getName();
            t.setName(tf.getText().trim());
            if (bo.isTypeExist(t)){

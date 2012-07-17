@@ -1,36 +1,16 @@
 package dao;
 
-import bean.FavoriteItem;
-import org.apache.ibatis.session.SqlSessionFactory;
+import bean.FavoriteNote;
 
-import java.sql.Timestamp;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
-public class FavoriteDAO extends AbsBaseIbatisDAO {
-    public FavoriteDAO(String namespace, SqlSessionFactory factory) {
-        super(namespace, factory);
-    }
+public interface FavoriteDAO {
+    List<FavoriteNote> selectAllItem();
 
-    public List<FavoriteItem> selectAllItem(){
-        return selectList("selectAllItem");
-    }
+    void deleteItem(Integer no);
 
-    public void deleteItem(Integer no){
-        delete("deleteItem",no);
-    }
+    void insertItem(int noteNo);
 
-    public void insertItem(int noteNo){
-        Map params=new HashMap();
-        params.put("noteNo",noteNo);
-        params.put("dropDate",new Timestamp(System.currentTimeMillis()));
-        insert("insertItem", params);
-    }
-
-    public boolean isExist(int noteNo){
-        return selectOne("selectItem",noteNo)!=null;
-    }
+    boolean isExist(int noteNo);
 }

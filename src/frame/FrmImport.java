@@ -8,23 +8,16 @@ package frame;
 
 import action.TypeCallback;
 import bean.Note;
-import bean.Type;
+import bean.NoteType;
 import bo.BookBO;
-import dao.FavoriteDAO;
-import dao.NoteDAO;
-import dao.TypeDAO;
-import db.DBConnection;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import other.MyUtil;
 import other.PropHelper;
-import tree.TypeTreeWrapper;
 import xdg.XdgUtil;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableModel;
-import javax.xml.crypto.Data;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -76,7 +69,7 @@ public class FrmImport extends javax.swing.JFrame {
 						"Title 2", "Title 3", "Title 4" }));
 		jScrollPane1.setViewportView(tblImport);
 
-		jButton1.setText("Select Target Type");
+		jButton1.setText("Select Target NoteType");
 		jButton1.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				jButton1ActionPerformed(evt);
@@ -171,7 +164,7 @@ public class FrmImport extends javax.swing.JFrame {
 	 */
 	private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {
 		TypeCallback callback = new TypeCallback() {
-			public void handle(Type type) {
+			public void handle(NoteType type) {
 				int[] selected = tblImport.getSelectedRows();
 				if (selected.length == 0) {
 					XdgUtil.showMsg(null, "Select records first");
@@ -256,7 +249,7 @@ public class FrmImport extends javax.swing.JFrame {
 
 class ImportTableModel extends AbstractTableModel {
 	private List<Note> notes;
-	private String[] colNames = { "No.", "Title", "Type", "Creation Time" };
+	private String[] colNames = { "No.", "Title", "NoteType", "Creation Time" };
 
 	ImportTableModel(List<Note> notes) {
 		this.notes = notes;

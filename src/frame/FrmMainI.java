@@ -12,7 +12,6 @@ package frame;
 
 import java.awt.event.*;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.*;
 import java.util.List;
 import java.util.logging.Level;
@@ -22,9 +21,12 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.text.BadLocationException;
 
 import action.TypeCallback;
-import bean.FavoriteItem;
+import bean.FavoriteNote;
+import bean.NoteType;
 import com.xdg.util.*;
-import dao.FavoriteDAO;
+import dao.ibatis.FavoriteDAOIbts;
+import dao.ibatis.NoteDAOIbts;
+import dao.ibatis.NoteTypeDAOIbts;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -46,10 +48,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.lang.reflect.InvocationTargetException;
 
-import dao.TypeDAO;
-import dao.NoteDAO;
 import bean.Note;
-import bean.Type;
 import bo.BookBO;
 import dbwin.DbWinModel;
 import dbwin.render.TypeRender;
@@ -57,11 +56,7 @@ import dbwin.editor.TypeEditor;
 import db.DBConnection;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.io.Reader;
-import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.text.DefaultHighlighter;
@@ -78,7 +73,7 @@ public class FrmMainI extends JFrame {
 
     private NoteDAO noteDAO;
     private TypeDAO typeDAO;
-    private FavoriteDAO favDAO;
+    private FavoriteDAOIbts favDAO;
     private BookBO bookBO;
     private List<Note> searchedNotes;
     private NoteTableModel2 currentModel;
@@ -167,7 +162,7 @@ public class FrmMainI extends JFrame {
                     final Note n = stkRecent.get(k);
                     ++i;
                     if (i > Constant.MAX_RECENT_BROWSED_REC) break;
-                    popRecent.add(new AbstractAction("No." + i + " " + n.getTitle() + "  //" + n.getType().getName()) {
+                    popRecent.add(new AbstractAction("No." + i + " " + n.getTitle() + "  //" + n.getNoteType().getName()) {
                         public void actionPerformed(ActionEvent e) {
                             try {
                                 if (saveBeforeAction() == false) return;
@@ -181,7 +176,7 @@ public class FrmMainI extends JFrame {
                                 e1.printStackTrace();
                             }
 
-                            selectNote(n.getId(), n.getType().getId());
+                            selectNote(n.getId(), n.getNoteType().getId());
                         }
                     });
                 }
@@ -221,9 +216,9 @@ public class FrmMainI extends JFrame {
 
     private void initBO() throws IOException {
 
-        noteDAO = new NoteDAO("book.note", DBConnection.createSessionFactory());
-        typeDAO = new TypeDAO("book.type", DBConnection.createSessionFactory());
-        favDAO = new FavoriteDAO("book.favorite", DBConnection.createSessionFactory());
+        noteDAO = new NoteDAOIbts("book.note", DBConnection.createSessionFactory());
+        typeDAO = new NoteTypeDAOIbts("book.type", DBConnection.createSessionFactory());
+        favDAO = new FavoriteDAOIbts("book.favorite", DBConnection.createSessionFactory());
         bookBO = new BookBO();
         bookBO.setNoteDAO(noteDAO);
         bookBO.setTypeDAO(typeDAO);
@@ -517,8 +512,8 @@ public class FrmMainI extends JFrame {
         common.add(itClose);
 
         JMenu maintain = new JMenu("Maintain");
-        JMenuItem itChangeType = new JMenuItem("Change Type");
-        JMenuItem itHide = new JMenuItem("Hide Current Type");
+        JMenuItem itChangeType = new JMenuItem("Change NoteType");
+        JMenuItem itHide = new JMenuItem("Hide Current NoteType");
         maintain.add(itChangeType);
         maintain.add(itHide);
 
@@ -566,7 +561,7 @@ public class FrmMainI extends JFrame {
         favorite.addMenuListener(new MenuListener() {
             public void menuSelected(MenuEvent e) {
 
-                List<FavoriteItem> favoriteItems = bookBO.getFavoriteItemList();
+                List<FavoriteNote> favoriteItems = bookBO.getFavoriteItemList();
                 favorite.removeAll();
 
                 favorite.add(new AbstractAction("Manage Favorite") {
@@ -576,8 +571,8 @@ public class FrmMainI extends JFrame {
                 });
 
                 favorite.addSeparator();
-                for (final FavoriteItem item : favoriteItems) {
-                    favorite.add(new JMenuItem(new AbstractAction(item.getNote().getTitle() + "  //" + item.getType().getName()) {
+                for (final FavoriteNote item : favoriteItems) {
+                    favorite.add(new JMenuItem(new AbstractAction(item.getNote().getTitle() + "  //" + item.getNoteType().getName()) {
                         public void actionPerformed(ActionEvent e) {
                             try {
                                 if (saveBeforeAction() == false) return;
@@ -591,7 +586,7 @@ public class FrmMainI extends JFrame {
                                 e1.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                             }
 
-                            selectNote(item.getNote().getId(), item.getType().getId());
+                            selectNote(item.getNote().getId(), item.getNoteType().getId());
                         }
                     }));
                 }
@@ -664,7 +659,7 @@ public class FrmMainI extends JFrame {
                 }
 
                 TypeCallback callback=new TypeCallback() {
-                    public void handle(Type type) {
+                    public void handle(NoteType type) {
                         if (XdgUtil.showConfirm(null, "You sure to change the test to '"
                                 + type.getName() + "'?") != 1) return;
 
@@ -699,8 +694,8 @@ public class FrmMainI extends JFrame {
     private void setRightMenu() {
         popTypeTree = new JPopupMenu();
         popTable = new JPopupMenu();
-        // JMenuItem itHide=new JMenuItem("隐藏");
-        // JMenuItem itDelete=new JMenuItem("删除");
+        // JMenuItem itHide=new JMenuItem("闅愯棌");
+        // JMenuItem itDelete=new JMenuItem("鍒犻櫎");
 
         popTypeTree.add(new AbstractAction("Hide") {
 
@@ -712,10 +707,10 @@ public class FrmMainI extends JFrame {
         popTypeTree.add(new AbstractAction("Delete") {
             public void actionPerformed(ActionEvent e) {
                 if (typeWrapper.isNotSelecting()) return;
-                Type type = (Type) typeWrapper.getSelectedType();
-                if (Msg.showConfirm(FrmMainI.this, "Really delete \"" + type + "\"?") == 1) {
+                NoteType noteType = (NoteType) typeWrapper.getSelectedType();
+                if (Msg.showConfirm(FrmMainI.this, "Really delete \"" + noteType + "\"?") == 1) {
                     try {
-                        typeDAO.deepDelete(type.getId());
+                        typeDAO.deepDelete(noteType.getId());
                         typeWrapper.removeSelectedNode();
                     } catch (Exception ex) {
                         Msg.showError(FrmMainI.this, ex);
@@ -724,7 +719,7 @@ public class FrmMainI extends JFrame {
             }
         });
 
-        popTypeTree.add(new AbstractAction("Type Maintainence") {
+        popTypeTree.add(new AbstractAction("NoteType Maintainence") {
             public void actionPerformed(ActionEvent e) {
                 openTypeMaintain();
             }
@@ -762,15 +757,15 @@ public class FrmMainI extends JFrame {
     }
 
     /**
-     * 隐藏一个类别
+     * 闅愯棌涓�釜绫诲埆
      */
     private void hideOneType() {
         currentModel.stopEditing();
         try {
             if (saveBeforeAction()) {
                 if (Msg.showConfirm(FrmMainI.this, "Really hide it ?") == 1) {
-                    Type type = (Type) typeWrapper.getSelectedType();
-                    bookBO.hideType(type.getId());
+                    NoteType noteType = (NoteType) typeWrapper.getSelectedType();
+                    bookBO.hideType(noteType.getId());
                     typeWrapper.removeSelectedNode();
                 }
             }
@@ -808,7 +803,7 @@ public class FrmMainI extends JFrame {
 
             public void actionPerformed(ActionEvent e) {
                 Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
-                StringSelection selection = new StringSelection(taContent.getText());// 将字符串包装
+                StringSelection selection = new StringSelection(taContent.getText());// 灏嗗瓧绗︿覆鍖呰
                 clip.setContents(selection, null);
             }
         });
@@ -921,14 +916,14 @@ public class FrmMainI extends JFrame {
 
         Properties prop = new Properties();
         prop.load(FrmMainI.class.getResourceAsStream("/config.properties"));
-        Reader reader = Resources.getResourceAsReader("dao/dao.xml");
+        Reader reader = Resources.getResourceAsReader("dao/ibatis/dao.xml");
         SqlSessionFactory factory = new SqlSessionFactoryBuilder().build(reader, prop);
 
         BookBO bo = new BookBO();
 
 
-        // typeDAO=new TypeDAO();
-        // noteDAO=new NoteDAO();
+        // typeDAO=new NoteTypeDAOIbts();
+        // noteDAO=new NoteDAOIbts();
 //        List types = typeDAO.findAllWithRecSum(
 //                Constant.TYPE_SORT_RECORD_ALPHA, Constant.SORT_ASC);
 //        Collections.sort(types);
@@ -958,8 +953,8 @@ public class FrmMainI extends JFrame {
                 // if (isInFocus == false) {
                 // return;
                 // }
-                // if (currentModel.getStatus() == dbwin.Constant.NOT_CHANGED) {
-                // currentModel.setStatus(dbwin.Constant.MODIFIED);
+                // if (currentModel.getState() == dbwin.Constant.NOT_CHANGED) {
+                // currentModel.setState(dbwin.Constant.MODIFIED);
                 // ((Note)
                 // currentModel.getMappedType()).setContent(taContent.getText());
                 // System.out.println("doc:" + taContent.getText());
@@ -1001,7 +996,7 @@ public class FrmMainI extends JFrame {
 
         int firstTypeNo = 0;
 //        if (lstType.getVisibleRowCount() > 0 && lstType.getSelectedIndex() >= 0) {
-//            firstTypeNo = ((Type) lstType.getSelectedValue()).getId();
+//            firstTypeNo = ((NoteType) lstType.getSelectedValue()).getId();
 //        }
 
         searchedNotes = null;
@@ -1028,9 +1023,9 @@ public class FrmMainI extends JFrame {
                 dbwin.Constant.KEY_GENE_NEXT_OF_MAX, this);
         currentModel.setFieldPropCol(new String[]{"TITLE", "TIM", "TYPE_NO",
                 "ID", "CONTENT", "DEL"}, new String[]{"title", "ts", "typeId",
-                "id", "content", "del"}, new String[]{"Title", "Creation Date", "Type", "", "", ""});
+                "id", "content", "del"}, new String[]{"Title", "Creation Date", "NoteType", "", "", ""});
         currentModel.setShownTitleNames(new String[]{"No.", "Title", "Creation Date",
-                "Type"});
+                "NoteType"});
         currentModel.setEditableCols(new int[]{1, 2});
         tblData.setModel(currentModel);
         setListenerToNotes();
@@ -1119,11 +1114,11 @@ public class FrmMainI extends JFrame {
 
                             redoList = new DoubleLinkedList<CurrentContent>();
 
-                            // System.out.println("换行了。firstIndex="+e.getFirstIndex()+",lastIndex="+e.getLastIndex());
+                            // System.out.println("鎹㈣浜嗐�firstIndex="+e.getFirstIndex()+",lastIndex="+e.getLastIndex());
                             int realRow = tblData.convertRowIndexToModel(tblData.getSelectedRow());
                             Note n = (Note) searchedNotes.get(realRow);
                             taContent.setText(n.getContent());
-                            lblState.setText(String.format("  ID: %d, Title: %s, Type ID: %d", n.getId(), n.getTitle(), n.getTypeId()));
+                            lblState.setText(String.format("  ID: %d, Title: %s, NoteType ID: %d", n.getId(), n.getTitle(), n.getTypeId()));
 
                             // scrlContent.getViewport().setViewPosition(new
                             // Point(0,0));
@@ -1196,21 +1191,21 @@ public class FrmMainI extends JFrame {
         // }
         // });
 
-        // 插入
+        // 鎻掑叆
         concreteShortcut("ctrl N", new AbstractAction() {
 
             public void actionPerformed(ActionEvent e) {
                 insert();
             }
         });
-        // 删除
+        // 鍒犻櫎
         concreteShortcut("ctrl D", new AbstractAction() {
 
             public void actionPerformed(ActionEvent e) {
                 delete(false);
             }
         });
-        // 保存
+        // 淇濆瓨
         concreteShortcut("ctrl S", new AbstractAction() {
 
             public void actionPerformed(ActionEvent e) {
@@ -1261,7 +1256,7 @@ public class FrmMainI extends JFrame {
     }
 
     /**
-     * 保存
+     * 淇濆瓨
      */
     private void save() {
         try {
@@ -1323,11 +1318,11 @@ public class FrmMainI extends JFrame {
             return;
         }
 
-        Type type = typeWrapper.getSelectedType();
+        NoteType noteType = typeWrapper.getSelectedType();
         Note note = new Note();
         note.setTs(new Timestamp(System.currentTimeMillis()));
-        note.setType(type);
-        note.setTypeId(type.getId());
+        note.setNoteType(noteType);
+        note.setTypeId(noteType.getId());
         note.setDel(0);
         FrmMainI.this.currentModel.insert(note);
         int row = searchedNotes.size() - 1;
@@ -1363,9 +1358,9 @@ public class FrmMainI extends JFrame {
     }
 
     /**
-     * 关闭、改变类别、重新搜索等操作前判断数据是否改变，并保存
+     * 鍏抽棴銆佹敼鍙樼被鍒�閲嶆柊鎼滅储绛夋搷浣滃墠鍒ゆ柇鏁版嵁鏄惁鏀瑰彉锛屽苟淇濆瓨
      *
-     * @return true:允许进行下一步，false;不允许
+     * @return true:鍏佽杩涜涓嬩竴姝ワ紝false;涓嶅厑璁�
      * @throws NoSuchMethodException
      * @throws IllegalAccessException
      * @throws java.sql.SQLException
@@ -1532,7 +1527,7 @@ class NoteTableModel2 extends DbWinModel {
 
         Note note = (Note) data.get(row);
 
-//        if (note.getType().getShow() == 0) {
+//        if (note.getNoteType().getShow() == 0) {
 //            setRenderBackground(row, col, Color.LIGHT_GRAY);
 //        } else {
 //            setRenderBackground(row, col, Color.white);
@@ -1547,7 +1542,7 @@ class NoteTableModel2 extends DbWinModel {
         } else if (col == 2) {
             return note.getTs();
         } else {
-            return note.getType().getName();
+            return note.getNoteType().getName();
         }
     }
 
